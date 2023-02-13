@@ -25,6 +25,14 @@ RUN echo "root:root" | chpasswd && \
     chmod 0440 /etc/sudoers.d/${USER_NAME} && \
     chown -R ${USER_NAME}:${USER_NAME} ${USER_HOME}
 
+RUN { \
+  echo "OTHER_WRITABLE 01;32"; \
+  echo "STICKY_OTHER_WRITABLE 01;31"; \
+  echo "STICKY 01;31"; \
+  } > /root/.dircolors && \
+  cp /root/.dircolors ${USER_HOME} && \
+  chown -R ${USER_NAME}:${USER_NAME} ${USER_HOME}/.dircolors
+
 # Temporary permission(Restore permissions with entrypoint.sh)
 RUN chmod u+s /usr/sbin/usermod \
   && chmod u+s /usr/sbin/groupmod
