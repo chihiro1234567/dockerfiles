@@ -1,8 +1,8 @@
-version: "3"
+version: '3.8'
 services:
-  realsense_ros2:
+  ros2-foxy:
     image: chihiro1234567/ros2-foxy:realsense251-1.3
-    container_name: ros2-realsense-container
+    container_name: ros2_foxy_container
     tty: true
     privileged: true
     network_mode: host
@@ -15,7 +15,10 @@ services:
       - /dev:/dev
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
-      - .:/home/work/trial_ws
+      - ${PWD}/:/home/work/
     device_cgroup_rules:
       - 'c 81:* rmw'
       - 'c 189:* rmw'
+    user: "${USER_ID}:${GROUP_ID}"
+    working_dir: /home/work/
+
