@@ -1,0 +1,32 @@
+FROM chihiro1234567/ubuntu20:dev-1.0
+LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
+
+ENV ROS_DISTRO=foxy
+
+# ROS2-*-base
+RUN apt-get update && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends ros-${ROS_DISTRO}-ros-base  \
+    python3-argcomplete python3-colcon-common-extensions python3-colcon-mixin python3-rosdep python3-vcstool && \
+    pip install empy lark lark-parser catkin_pkg  && \
+    rm -rf /var/lib/apt/lists/* && \
+    rosdep init
+
+# colcon mixin
+RUN colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml && \
+    colcon mixin update && \
+    colcon metadata add default https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml && \
+    colcon metadata update
+
+# setup ${USER_NAME} bashrc
+RUN gosu ${USER_NAME} rosdep update --rosdistro $ROS_DISTRO && \
+    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${USER_HOME}/.bashrc && \
+    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ${USER_HOME}/.bashrc 
+
+RUN chown -R ${USER_NAME}:${USER_NAME} ${USER_HOME}
+
+# docker build -t chihiro1234567/ros2-foxy:base-1.0 -f Dockerfile_ros2-foxy-base ./
+# docker run -it --rm -u $(id -u):$(id -g) -v ${PWD}:/home/ubuntu/ros2_ws chihiro1234567/ros2-foxy:base-1.0
+

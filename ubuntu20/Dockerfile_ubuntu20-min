@@ -1,0 +1,41 @@
+FROM ubuntu:20.04
+LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
+
+# minimum develop installation
+RUN apt-get update -q && \
+    apt-get upgrade -yq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+    sudo lsb-release locales vim wget curl gnupg2 dirmngr git bash-completion tzdata gosu \
+    ca-certificates && \
+    update-ca-certificates && \
+    apt-get autoremove && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# user ubuntu (temp UID and GID)
+ENV USER_ID=1000 \
+  GROUP_ID=1000 \
+  USER_NAME=ubuntu \
+  USER_HOME=/home/ubuntu
+
+RUN echo "root:root" | chpasswd && \
+    groupadd -g ${GROUP_ID} ${USER_NAME} && \
+    adduser --uid ${USER_ID} --gid ${GROUP_ID} --home ${USER_HOME} --disabled-password --gecos "" "${USER_NAME}" && \
+    echo "${USER_NAME}:${USER_NAME}" | chpasswd && \
+    echo "%${USER_NAME}    ALL=(ALL)   NOPASSWD:    ALL" >> /etc/sudoers.d/${USER_NAME} && \
+    chmod 0440 /etc/sudoers.d/${USER_NAME} && \
+    chown -R ${USER_NAME}:${USER_NAME} ${USER_HOME}
+
+# Temporary permission(Restore permissions with entrypoint.sh)
+RUN chmod u+s /usr/sbin/usermod \
+  && chmod u+s /usr/sbin/groupmod
+
+COPY user-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["bash"]
+
+# docker build -t chihiro1234567/ubuntu20:min-1.0 -f Dockerfile_ubuntu20-min ./
+# docker run -it --rm chihiro1234567/ubuntu20:min-1.0 bash # root login
+# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:min-1.0 # your account login
+

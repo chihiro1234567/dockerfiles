@@ -1,0 +1,17 @@
+FROM chihiro1234567/ubuntu20:min-1.0
+LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
+
+# develop tools
+RUN apt-get update -q && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+    build-essential python3-pip python3-dev unzip cmake && \
+    apt-get autoremove && apt-get clean && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    pip3 install --upgrade pip && \
+    rm -rf /var/lib/apt/lists/*
+
+CMD ["bash"]
+
+# docker build -t chihiro1234567/ubuntu20:dev-1.0 -f Dockerfile_ubuntu20-dev ./
+# docker run -it --rm chihiro1234567/ubuntu20:dev-1.0 # root login
+# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:dev-1.0 # your account login

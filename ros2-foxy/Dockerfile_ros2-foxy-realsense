@@ -1,0 +1,63 @@
+# https://github.com/2b-t/realsense-ros2-docker#12-installation-from-source
+# https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile
+
+# librealsense build stage
+ARG BASE_IMAGE=chihiro1234567/ros2-foxy:base-1.0
+FROM $BASE_IMAGE as librealsense-builder
+LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
+
+SHELL ["/bin/bash", "-c"]
+
+# RealSense SDK
+RUN apt-get update -q && \
+    apt-get install -y --no-install-recommends \
+    libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev \
+    libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/src
+ARG REALSENSE_SDK_VER=2.51.1
+RUN wget -O librealsense.tar.gz https://github.com/IntelRealSense/librealsense/archive/refs/tags/v${REALSENSE_SDK_VER}.tar.gz && \
+    tar -zxf librealsense.tar.gz && \
+    rm librealsense.tar.gz
+RUN echo ------
+RUN ls
+RUN echo ------
+WORKDIR /usr/src/librealsense-${REALSENSE_SDK_VER}/build
+RUN cmake /usr/src/librealsense-${REALSENSE_SDK_VER} \
+    -DCMAKE_C_FLAGS_RELEASE="${CMAKE_C_FLAGS_RELEASE} -s" \
+    -DCMAKE_CXX_FLAGS_RELEASE="${CMAKE_CXX_FLAGS_RELEASE} -s" \
+    -DCMAKE_INSTALL_PREFIX=/opt/librealsense \
+    -DBUILD_GRAPHICAL_EXAMPLES=true \
+    -DFORCE_RSUSB_BACKEND=true \
+    -DCMAKE_BUILD_TYPE=release \
+    -DBUILD_PYTHON_BINDINGS:bool=true \
+    -DPYTHON_EXECUTABLE=$(which python3) \
+     && make -j"$(nproc)" all && make install
+    
+# ros2-foxy + realsesense-ros stage 
+FROM ${BASE_IMAGE} as librealsense
+
+SHELL ["/bin/bash", "-c"]
+
+ARG REALSENSE_SDK_VER=2.51.1
+COPY --from=librealsense-builder /opt/librealsense /usr/local/
+COPY --from=librealsense-builder /usr/lib/python3/dist-packages/pyrealsense2 /usr/lib/python3/dist-packages/pyrealsense2
+COPY --from=librealsense-builder /usr/src/librealsense-${REALSENSE_SDK_VER}/config/99-realsense-libusb.rules /etc/udev/rules.d/
+ENV PYTHONPATH=${PYTHONPATH}:/usr/local/lib
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    libglfw3-dev ros-${ROS_DISTRO}-rviz2 ros-${ROS_DISTRO}-v4l2-camera && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR ${USER_HOME}/ros2_ws/src
+RUN git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-development
+WORKDIR ${USER_HOME}/ros2_ws
+RUN apt-get update && gosu ${USER_NAME} rosdep update && \
+    gosu ${USER_NAME} rosdep install -i --from-path src --rosdistro $ROS_DISTRO --skip-keys=librealsense2 -y 
+RUN echo ==== colcon build ===
+RUN . /opt/ros/foxy/setup.bash && colcon build --symlink-install --cmake-clean-cache 
+
+# docker build -t chihiro1234567/ros2-foxy:realsense251-1.0 -f Dockerfile_ros2-foxy-realsense ./
+# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ros2-foxy:realsense251-1.0
+#
