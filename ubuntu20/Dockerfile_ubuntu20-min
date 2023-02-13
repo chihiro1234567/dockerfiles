@@ -43,7 +43,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["bash"]
 
-# docker build -t chihiro1234567/ubuntu20:min-1.0 -f Dockerfile_ubuntu20-min ./
-# docker run -it --rm chihiro1234567/ubuntu20:min-1.0 bash # root login
-# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:min-1.0 # your account login
+# docker build -t chihiro1234567/ubuntu20:min-1.1 -f Dockerfile_ubuntu20-min ./
+# docker run -it --rm chihiro1234567/ubuntu20:min-1.1 bash # root login
+# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:min-1.1 # your account login
 

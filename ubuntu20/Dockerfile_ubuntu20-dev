@@ -1,4 +1,4 @@
-FROM chihiro1234567/ubuntu20:min-1.0
+FROM chihiro1234567/ubuntu20:min-1.1
 LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
 
 # develop tools
@@ -12,6 +12,6 @@ RUN apt-get update -q && \
 
 CMD ["bash"]
 
-# docker build -t chihiro1234567/ubuntu20:dev-1.0 -f Dockerfile_ubuntu20-dev ./
-# docker run -it --rm chihiro1234567/ubuntu20:dev-1.0 # root login
-# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:dev-1.0 # your account login
+# docker build -t chihiro1234567/ubuntu20:dev-1.1 -f Dockerfile_ubuntu20-dev ./
+# docker run -it --rm chihiro1234567/ubuntu20:dev-1.1 # root login
+# docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ubuntu20:dev-1.1 # your account login

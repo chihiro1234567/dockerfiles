@@ -57,15 +57,15 @@ https://github.com/IntelRealSense/librealsense/releases/tag/v2.51.1
 https://github.com/2b-t/realsense-ros2-docker
 
 ```
-> docker pull chihiro1234567/ros2-foxy:base-1.0
-> docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ros2-foxy:base-1.0 bash
+> docker pull chihiro1234567/ros2-foxy:base-1.3
+> docker run -it --rm -u $(id -u):$(id -g) chihiro1234567/ros2-foxy:base-1.3 bash
 $ ros2 ...
 ```
 
 イメージのpullとこのリポジトリからdocker-composeファイルを取得.
 
 ```bash
-> docker pull chihiro1234567/ros2-foxy:realsense251-1.1
+> docker pull chihiro1234567/ros2-foxy:realsense251-1.3
 > git clone git@github.com:chihiro1234567/dockerfiles.git
 > cd dockerfiles/ros2-foxy
 ```
@@ -76,7 +76,7 @@ Realsenseデバイスを接続して、`ros2-realsense-container`コンテナを
 > docker compose -f docker-compose-realsense.yml up -d
 > docker compose -f docker-compose-realsense.yml ps
 NAME                       IMAGE                                       COMMAND                 SERVICE         CREATED        STATUS
-ros2-realsense-container   chihiro1234567/ros2-foxy:realsense251-1.1   "/entrypoint.sh bash"   realsense_ros2  7 seconds ago  Up 6 seconds        
+ros2-realsense-container   chihiro1234567/ros2-foxy:realsense251-1.3   "/entrypoint.sh bash"   realsense_ros2  7 seconds ago  Up 6 seconds        
 ```
 > 重要) コンテナ使う前に`xhost`を実行しておく必要がある. (`No Protocol`エラーが出る)
 
@@ -99,4 +99,15 @@ rviz2はrootではなく、ユーザアカウントで中から実行したら�
 ```bash
 > docker exec -it -u $(id -u):$(id -g) ros2-realsense-container bash
 $ rviz2
+```
+
+docker-compose-realsense.ymlにはカレントディレクトリを`/home/work`にマウントする設定が追加されている
+
+```bash
+> ls
+> {ホスト側のディレクトリ・ファイル}
+> docker exec -it -u $(id -u):$(id -g) ros2-realsense-container bash
+$ cd /home/work
+$ ls
+$ {ホスト側のディレクトリ・ファイル}
 ```

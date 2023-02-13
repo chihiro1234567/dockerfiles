@@ -1,4 +1,4 @@
-FROM chihiro1234567/ubuntu20:dev-1.0
+FROM chihiro1234567/ubuntu20:dev-1.1
 LABEL  maintainer "chihiro1234567 <chihirodoi@outlook.jp>"
 
 ENV ROS_DISTRO=foxy
@@ -27,6 +27,6 @@ RUN gosu ${USER_NAME} rosdep update --rosdistro $ROS_DISTRO && \
 
 RUN chown -R ${USER_NAME}:${USER_NAME} ${USER_HOME}
 
-# docker build -t chihiro1234567/ros2-foxy:base-1.0 -f Dockerfile_ros2-foxy-base ./
-# docker run -it --rm -u $(id -u):$(id -g) -v ${PWD}:/home/ubuntu/ros2_ws chihiro1234567/ros2-foxy:base-1.0
+# docker build -t chihiro1234567/ros2-foxy:base-1.3 -f Dockerfile_ros2-foxy-base ./
+# docker run -it --rm -u $(id -u):$(id -g) -v ${PWD}:/home/ubuntu/ros2_ws chihiro1234567/ros2-foxy:base-1.3
 
