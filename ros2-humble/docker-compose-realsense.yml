@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  ros2-humble:
+    image: chihiro1234567/ros2-humble:realsense251-1.0
+    container_name: ros2_humble_container
+    tty: true
+    privileged: true
+    network_mode: host
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    runtime: nvidia
+    volumes:
+      - /dev:/dev
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - ${PWD}/:/home/work/
+    device_cgroup_rules:
+      - 'c 81:* rmw'
+      - 'c 189:* rmw'
+    user: "${USER_ID}:${GROUP_ID}"
+    working_dir: /home/work/
+
