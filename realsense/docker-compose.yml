@@ -1,8 +1,8 @@
 version: '3.8'
 services:
   ros2-foxy:
-    image: chihiro1234567/ros2-foxy:realsense251-1.4
-    container_name: ros2_foxy_container
+    image: chihiro1234567/realsense:lib-2.51.1
+    container_name: realsense-container
     tty: true
     privileged: true
     network_mode: host
@@ -22,3 +22,6 @@ services:
     user: "${USER_ID}:${GROUP_ID}"
     working_dir: /home/work/
 
+# sudo xhost +
+# docker compuse up -d
+# docker exec -it realsense-container bash
